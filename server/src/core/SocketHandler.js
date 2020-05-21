@@ -1,3 +1,5 @@
+const Metadata = require("../utils/Metadata");
+
 class SocketHandler {
 
     _socket;
@@ -18,34 +20,35 @@ class SocketHandler {
         this._discordClient.on(event, listener)
     }
 
-    _isCorrectGuild = (channel, returnTicketId) => {
+    _getTicketMetadata = (channel) => {
         const messages = channel.messages.cache.array();
-        for (const message of messages) {
-            if (message.content.match(/[||{{].*[}}||]/g)) {
-                const msg = message.content;
-                const payload = msg.split('{{')[1].split('}}')[0];
-                const values = payload.split("&");
-                const json = {};
-                values.forEach(value => json[value.split("=")[0]] = value.split("=")[1]);
+        for (const message of messages.reverse()) {
+            if (Metadata.isMetadata(message.content)) {
+                const parsed = Metadata.parse(message.content);
     
-                if (json.guild === this._guildId) {
-                    if (returnTicketId) {
-                        return json.ticket;
-                    }
-                    return true;
+                if (parsed.guild === this._guildId) {
+                    return parsed;
                 }
             }
         }
+        return false;
     }
 
     _onDiscordPrivateTicketMessage = (callback) => {
         this._discordClient.on("message", msg => {
             if (msg.channel.guild) return;
 
-            if (this._isCorrectGuild(msg.channel)) {
+            if (this._getTicketMetadata(msg.channel)) {
                 callback(msg);
             }
         });
+    }
+
+    _sendMessage = async (message) => {
+        if (this._channelId) {
+            const channel = this._discordClient.channels.resolve(this._channelId);
+            await channel.send(message);
+        }
     }
 }
 

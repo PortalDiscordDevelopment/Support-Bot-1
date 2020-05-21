@@ -1,4 +1,5 @@
 const SocketHandler = require("./SocketHandler");
+const Metadata = require("../utils/Metadata");
 
 class ChatSocketHandler extends SocketHandler {
 
@@ -18,6 +19,8 @@ class ChatSocketHandler extends SocketHandler {
 
         this._addSocketListener("send-message", this._handleSendMessage);
 
+        this._addSocketListener("close-ticket", this._handleCloseTicket);
+
         this._onDiscordPrivateTicketMessage(this._handleDispatchNewMessage);
     }
 
@@ -31,11 +34,8 @@ class ChatSocketHandler extends SocketHandler {
         }
     }
 
-    _handleSendMessage = ({ message }) => {
-        if (this._channelId) {
-            const channel = this._discordClient.channels.resolve(this._channelId);
-            channel.send(`**${this._socket.handshake.query.agent} :** ${message}`);
-        }
+    _handleSendMessage = async ({ message }) => {
+        await this._sendMessage(`**${this._socket.handshake.query.agent} :** ${message}`);
     };
 
     _handleDispatchAllMessages = () => {
@@ -46,6 +46,23 @@ class ChatSocketHandler extends SocketHandler {
             });
         }
     };
+
+    _handleCloseTicket = async () => {
+        const channel = this._discordClient.channels.resolve(this._channelId);
+
+        const metadata = {
+            guild: this._guildId,
+            ticket: this._getTicketMetadata(channel).ticket,
+            action: "close"
+        };
+
+        await this._sendMessage(Metadata.generate(metadata));
+        await this._sendMessage(`__**Ticket closed by agent**__\nFurther messages will get lost, please open a new ticket if needed.`);
+
+        await channel.delete();
+
+        this._socket.emit("ticket-closed");
+    }
 }
 
 module.exports = ChatSocketHandler;

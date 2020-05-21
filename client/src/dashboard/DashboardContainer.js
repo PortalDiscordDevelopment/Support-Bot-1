@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from 'prop-types';
-import { withRouter } from "react-router-dom";
 import DashboardComponent from "./DashboardComponent";
 import * as actionCreators from "./actionCreators";
 import * as selectors from "./selectors";
@@ -42,6 +41,11 @@ class DashboardContainer extends React.Component {
         await dispatch(actionCreators.disconnectChannel());
     }
 
+    _handleCloseTicket = async () => {
+        const { dispatch } = this.props;
+        await dispatch(actionCreators.closeTicket());
+    }
+
     render() {
         const { guilds, tickets, messages, currentTicket } = this.props;
 
@@ -52,6 +56,7 @@ class DashboardContainer extends React.Component {
                 handleClickTicket={this._handleClickTicket}
                 handleLeaveTicket={this._handleLeaveTicket}
                 handleClickSendMessage={this._handleClickSendMessage}
+                handleCloseTicket={this._handleCloseTicket}
                 tickets={tickets}
                 currentTicket={currentTicket}
                 messages={messages}
@@ -68,4 +73,4 @@ DashboardContainer.propTypes = {
     messages: PropTypes.array.isRequired
 };
 
-export default withRouter(connect(mapStateToProps)(DashboardContainer));
+export default connect(mapStateToProps)(DashboardContainer);

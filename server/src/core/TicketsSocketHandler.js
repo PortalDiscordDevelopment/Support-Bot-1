@@ -18,7 +18,7 @@ class TicketsSocketHandler extends SocketHandler {
         const DMChannelIds = Array.from(this._discordClient.channels.cache.filter(channel => channel.type === "dm").keys());
         for (const DMChannelId of DMChannelIds) {
             const channel = await this._discordClient.channels.fetch(DMChannelId);
-            if (this._isCorrectGuild(channel)) {
+            if (this._getTicketMetadata(channel)) {
                 this._handleDispatchGuildTickets(channel);
             }
         }
@@ -39,8 +39,9 @@ class TicketsSocketHandler extends SocketHandler {
 
         this._tickets.push({
             ...channel.toJSON(),
-            ticketId: this._isCorrectGuild(channel, true),
-            lastMessage: channel.lastMessage.toJSON()
+            ticketId: this._getTicketMetadata(channel).ticket,
+            lastMessage: channel.lastMessage.toJSON(),
+            status: this._getTicketMetadata(channel).action
         });
         this._socket.emit("tickets", {
             tickets: this._tickets

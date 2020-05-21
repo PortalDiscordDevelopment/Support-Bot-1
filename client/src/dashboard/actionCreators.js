@@ -36,7 +36,11 @@ export const initSocketHandler = (guildId: string) =>
 
     _socket.on("messages", async ({ messages }) => {
       await dispatch(createAction(SET_MESSAGES)({ messages }));
-  });
+    });
+
+    _socket.on("ticket-closed", async () => {
+      await dispatch(disconnectChannel());
+    });
   };
 
 export const connectChannel = (ticket: any) =>
@@ -64,6 +68,13 @@ export const sendMessage = (message: string) =>
       _socket.emit("send-message", {
         message
       });
+    }
+  };
+
+export const closeTicket = () =>
+  async (dispatch: any) => {
+    if(_socket) {
+      _socket.emit("close-ticket");
     }
   };
 

@@ -27,7 +27,7 @@ const columns = [
 class DashboardComponent extends React.PureComponent {
 
     render() {
-      const { guilds, handleSwitchGuild, tickets, messages, currentTicket, handleClickTicket, handleLeaveTicket, handleClickSendMessage } = this.props;
+      const { guilds, handleSwitchGuild, tickets, messages, currentTicket, handleClickTicket, handleLeaveTicket, handleClickSendMessage, handleCloseTicket } = this.props;
 
       console.log(tickets);
       console.log("messages", messages);
@@ -40,6 +40,7 @@ class DashboardComponent extends React.PureComponent {
             messages={messages} 
             handleLeaveTicket={handleLeaveTicket} 
             handleClickSendMessage={handleClickSendMessage}
+            handleCloseTicket={handleCloseTicket}
           />
         );
       }
@@ -85,6 +86,7 @@ DashboardComponent.propTypes = {
   handleClickTicket: PropTypes.func.isRequired,
   handleLeaveTicket: PropTypes.func.isRequired,
   handleClickSendMessage: PropTypes.func.isRequired,
+  handleCloseTicket: PropTypes.func.isRequired,
   tickets: PropTypes.array.isRequired,
   currentTicket: PropTypes.object,
   messages: PropTypes.array.isRequired

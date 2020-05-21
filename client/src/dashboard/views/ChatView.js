@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import { PageHeader, Input } from "antd";
+import { PageHeader, Input, Button } from "antd";
 import Markdown from "react-markdown";
 
 const { Search } = Input;
@@ -8,13 +8,18 @@ const { Search } = Input;
 class ChatView extends React.PureComponent {
 
     render() {
-      const { messages, ticket, handleLeaveTicket, handleClickSendMessage } = this.props;
+      const { messages, ticket, handleLeaveTicket, handleClickSendMessage, handleCloseTicket } = this.props;
 
       return (
         <div>
             <PageHeader
                 onBack={handleLeaveTicket}
                 title={`Ticket # ${ticket.ticketId}`}
+                extra={[
+                    <Button type="primary" danger onClick={handleCloseTicket}>
+                        Close ticket
+                    </Button>
+                ]}
             />
         
             <div>
@@ -40,7 +45,8 @@ ChatView.propTypes = {
     ticket: PropTypes.object.isRequired,
     messages: PropTypes.array.isRequired,
     handleLeaveTicket: PropTypes.func.isRequired,
-    handleClickSendMessage: PropTypes.func.isRequired
+    handleClickSendMessage: PropTypes.func.isRequired,
+    handleCloseTicket: PropTypes.func.isRequired
 };
 
 export default ChatView;
