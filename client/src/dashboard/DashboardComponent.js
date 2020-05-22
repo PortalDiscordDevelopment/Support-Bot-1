@@ -19,7 +19,7 @@ const columns = [
     title: 'Last Message',
     dataIndex: 'lastMessage',
     render: (lastMessage) => (
-      <span>{lastMessage.content}</span>
+      <span>{lastMessage && lastMessage.content && lastMessage.content}</span>
     )
   },
 ];
