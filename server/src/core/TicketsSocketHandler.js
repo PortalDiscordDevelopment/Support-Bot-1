@@ -28,6 +28,7 @@ class TicketsSocketHandler extends SocketHandler {
         const author = this._discordClient.users.resolve(channel.recipient);
         if (author) {
             channel.recipient = author.username;
+            channel.authorID = author.id;
         }
         if (this._tickets.findIndex(_channel => _channel.id === channel.id) !== -1) {
             const tmp = [];

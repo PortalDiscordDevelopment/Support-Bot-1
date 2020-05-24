@@ -1,14 +1,38 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import { PageHeader, Input, Button } from "antd";
+import { PageHeader, Button } from "antd";
 import Markdown from "react-markdown";
-
-const { Search } = Input;
+import { MessageList, Input } from 'react-chat-elements';
+import { messages } from '../selectors';
 
 class ChatView extends React.PureComponent {
 
+    state = { message: "" };
+
+    inputRef = React.createRef();
+    messagesEndRef = React.createRef();
+
+    componentDidMount() {
+      this.scrollToBottom();
+    }
+
+    componentDidUpdate() {
+      this.scrollToBottom();
+    }
+
+    scrollToBottom = () => {
+      this.messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    _handleSendMessage = () => {
+        const { handleClickSendMessage } = this.props;
+        const { message } = this.state;
+        handleClickSendMessage(message);
+        this.inputRef.clear();
+    }
+
     render() {
-      const { messages, ticket, handleLeaveTicket, handleClickSendMessage, handleCloseTicket } = this.props;
+      const { messages, ticket, handleLeaveTicket, handleCloseTicket } = this.props;
 
       return (
         <div>
@@ -21,20 +45,36 @@ class ChatView extends React.PureComponent {
                     </Button>
                 ]}
             />
-        
-            <div>
-                {messages.map(msg => (
-                    <div style={{ width: '100%', backgroundColor: "white", borderRadius: 14, padding: 20, marginBottom: 20 }}>
-                        <Markdown source={msg.content} />
-                        <br />
-                    </div>
-                ))}
-                <Search
-                    placeholder="Message"
-                    enterButton="Send"
-                    size="large"
-                    onSearch={handleClickSendMessage}
-                />
+            <div style={{ display: "flex", flex: 1, flexDirection: "column" }}>
+                <div style={{ overflow: "scroll", height: window.innerHeight * 0.7 }}>
+                    <MessageList
+                        dataSource={
+                            messages.map(msg => {
+                                return {
+                                    position: ticket.authorID === msg.author.id ? 'left' : 'right',
+                                    type: msg.attachments.length > 0 ? "photo" : "text",
+                                    text: msg.cleanContent ? msg.cleanContent : msg.content,
+                                    date: new Date(msg.createdTimestamp),
+                                    data: msg.attachments.length > 0 ? {
+                                        uri: msg.attachments[0],
+                                    } : {}
+                                }
+                            })
+                        }
+                    />
+                    <div ref={this.messagesEndRef} />
+                </div>
+                <div style={{ marginTop: 20, position: "sticky" }}>
+                    <Input
+                        ref={el => (this.inputRef = el)}
+                        placeholder="Message..."
+                        multiline={true}
+                        rightButtons={
+                            <Button type="primary" onClick={this._handleSendMessage}>Send</Button>
+                        }
+                        onChange={e => this.setState({ message: e.target.value })} 
+                    />
+                </div>
             </div>
         </div>
       );
@@ -46,7 +86,7 @@ ChatView.propTypes = {
     messages: PropTypes.array.isRequired,
     handleLeaveTicket: PropTypes.func.isRequired,
     handleClickSendMessage: PropTypes.func.isRequired,
-    handleCloseTicket: PropTypes.func.isRequired
+    handleCloseTicket: PropTypes.func.isRequired,
 };
 
 export default ChatView;

@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import { createStore } from "./src/store";
 import RootNavigator from "./src/RootNavigator";
 import 'antd/dist/antd.css';
+import 'react-chat-elements/dist/main.css';
 
 const initialState = window.__INITIAL_STATE__;
 const store = createStore(initialState);

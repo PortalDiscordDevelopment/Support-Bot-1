@@ -29,7 +29,14 @@ class ChatSocketHandler extends SocketHandler {
             const messages = message.channel.messages.cache.array();
 
             this._socket.emit("messages", {
-                messages
+                messages: messages.map(msg => {
+                    return {
+                        ...msg,
+                        attachments: [
+                            ...msg.attachments.map(attachment => attachment.url)
+                        ]
+                    }
+                })
             });
         }
     }
@@ -41,8 +48,16 @@ class ChatSocketHandler extends SocketHandler {
     _handleDispatchAllMessages = () => {
         if (this._channelId) {
             const channel = this._discordClient.channels.resolve(this._channelId);
+            if (!channel) return;
             this._socket.emit("messages", {
-                messages: channel.messages.cache.array()
+                messages: channel.messages.cache.array().map(msg => {
+                    return {
+                        ...msg,
+                        attachments: [
+                            ...msg.attachments.map(attachment => attachment.url)
+                        ]
+                    }
+                })
             });
         }
     };
