@@ -25,7 +25,10 @@ require('dotenv').config();
 client.on('message', async msg => {
     if (msg.author.bot) return;
     if (!msg.channel.guild) return;
-
+    
+    if (msg.content === "%info") {
+        msg.channel.send("Support Bot Credits:\nDirector: Thomas Morton\nDeveloper: Lucien (Surname)\nWith help from: (Blobby's real name)\nFramework: Javascript\nSupport Link: https://discord.gg/ayYGhZr")
+    };
     if (msg.content === "%new") {
         const DMChannelIds = Array.from(client.channels.cache.filter(channel => channel.type === "dm").keys());
         for (const DMChannelId of DMChannelIds) {
